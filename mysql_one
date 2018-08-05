@@ -1,0 +1,92 @@
+from pymysql import *
+
+
+class JDdb(object):
+    def __init__(self):
+        self.__conn = connect(host='127.0.0.1', port=3306, database='jddb', user='root', password='mysql',charset='utf8')
+        self.__cur = self.__conn.cursor()
+
+    def close_all(self):
+        self.__cur.close()
+        self.__conn.close()
+
+    def search_goods_all(self):
+        sql = '''select * from goods;'''
+        self.__cur.execute(sql)
+        tabledata = self.__cur.fetchall()
+        self.show(tabledata)
+
+    def search_cates_all(self):
+         sql = '''select * from goods_cates;'''
+         self.__cur.execute(sql)
+         tabledata = self.__cur.fetchall()
+         self.show(tabledata)
+
+    def search_brands_all(self):
+         sql = '''select * from goods_brands;'''
+         self.__cur.execute(sql)
+         tabledata = self.__cur.fetchall()
+         self.show(tabledata)
+
+    def show(self, table):
+        for i in table:
+            print(i)
+
+    def add_cates(self, adds):
+        sql = '''insert into goods_cates values(0, %s);'''
+        self.__cur.execute(sql, [adds])
+        self.__conn.commit()
+        tabledata = self.__cur.fetchall()
+        self.show(tabledata)
+
+    def select_no_safe(self):
+        name = input("请输入要查询的商品名称：")
+        sql = '''select * from goods where id=%s;''' % name
+        self.__cur.execute(sql)
+        self.__conn.commit()
+        tabledata = self.__cur.fetchall()
+        self.show(tabledata)
+
+    def selecte_y_safe(self):
+        find_name = input("请输入要查询的商品名称：")
+        sql = '''select * from goods where id=%s;'''
+        self.__cur.execute(sql, [find_name])
+        self.__conn.commit()
+        tabledata = self.__cur.fetchall()
+        self.show(tabledata)
+
+    def run(self):
+        while True:
+            print("""
+    1-查询所有商品信息
+    2-查询所有商品在种类信息
+    3-查询所有商品在品牌信息
+    4-添加商品种类
+    5-根据id查询商品信息
+    6-根据id查询商品信息安全方式
+    7-exit退出
+    """)
+            sel_id = input("功能选项---1-7：")
+            if sel_id == '1':
+                self.search_goods_all()
+            elif sel_id == '2':
+                self.search_cates_all()
+            elif sel_id == '3':
+                self.search_brands_all()
+            elif sel_id == '4':
+                add = input('请输入添加的商品种类：')
+                self.add_cates(add)
+            elif sel_id == '5':
+                self.select_no_safe()
+            elif sel_id == '6':
+                self.selecte_y_safe()
+            elif sel_id == '7':
+                self.close_all()
+                break
+
+def main():
+    jd = JDdb()
+    jd.run()
+
+if __name__ == "__main__":
+    main();
